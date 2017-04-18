@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,16 +27,25 @@ public class Project {
 	@Id
 	@Column(name = "ID")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int projectId;
+	private int id;
+
 	private String projectName;
+
 	private String billingModel;
+
 	private int budget;
+
 	private Boolean isEnabled;
+
 	private String intelManagerName;
-	
-	@ManyToMany(cascade = CascadeType.ALL)
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<TaskCategory> category = new HashSet<>(0);
 	
+	public Project() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @param projectName
 	 * @param billingModel
@@ -57,8 +67,8 @@ public class Project {
 	/**
 	 * @return the projectId
 	 */
-	public int getProjectId() {
-		return projectId;
+	public int getId() {
+		return id;
 	}
 
 	/**
@@ -69,7 +79,8 @@ public class Project {
 	}
 
 	/**
-	 * @param projectName the projectName to set
+	 * @param projectName
+	 *            the projectName to set
 	 */
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
@@ -83,7 +94,8 @@ public class Project {
 	}
 
 	/**
-	 * @param billingModel the billingModel to set
+	 * @param billingModel
+	 *            the billingModel to set
 	 */
 	public void setBillingModel(String billingModel) {
 		this.billingModel = billingModel;
@@ -97,7 +109,8 @@ public class Project {
 	}
 
 	/**
-	 * @param budget the budget to set
+	 * @param budget
+	 *            the budget to set
 	 */
 	public void setBudget(int budget) {
 		this.budget = budget;
@@ -111,7 +124,8 @@ public class Project {
 	}
 
 	/**
-	 * @param isEnabled the isEnabled to set
+	 * @param isEnabled
+	 *            the isEnabled to set
 	 */
 	public void setIsEnabled(Boolean isEnabled) {
 		this.isEnabled = isEnabled;
@@ -125,7 +139,8 @@ public class Project {
 	}
 
 	/**
-	 * @param intelManagerName the intelManagerName to set
+	 * @param intelManagerName
+	 *            the intelManagerName to set
 	 */
 	public void setIntelManagerName(String intelManagerName) {
 		this.intelManagerName = intelManagerName;
@@ -139,11 +154,20 @@ public class Project {
 	}
 
 	/**
-	 * @param category the category to set
+	 * @param category
+	 *            the category to set
 	 */
 	public void setCategory(Set<TaskCategory> category) {
 		this.category = category;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Project [projectId=" + id + ", projectName=" + projectName + ", billingModel=" + billingModel
+				+ ", budget=" + budget + ", isEnabled=" + isEnabled + ", intelManagerName=" + intelManagerName + "]";
+	}
 
 }

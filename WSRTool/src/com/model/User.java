@@ -261,9 +261,6 @@ public class User {
 	 */
 	@Override
 	public String toString() {
-		return "User [userId=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId
-				+ ", password=" + password + ", role=" + role + ", dob=" + dob + ", wwid=" + wwid + ", wiproEmpId="
-				+ wiproEmpId + ", isAdmin=" + isAdmin + ", isManager=" + isManager + ", isEnabled=" + isEnabled
-				+ ", projectId=" + projectId + "]";
+		return new Gson().toJson(this);
 	}
 }

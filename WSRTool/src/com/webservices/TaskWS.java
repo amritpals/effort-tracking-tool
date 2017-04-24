@@ -144,7 +144,7 @@ public class TaskWS implements WebServices {
 	@Path("{taskId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(@PathParam("taskId") Integer taskId) {
+	public Response getById(@PathParam("taskId") Integer taskId) {
 		Task task = new Task();
 		task = dao.getById(taskId);
 		if (task == null) {

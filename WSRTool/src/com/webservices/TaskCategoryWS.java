@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -126,6 +127,7 @@ public class TaskCategoryWS implements WebServices {
 	 * @see com.webservices.WebServices#delete(java.lang.Integer)
 	 */
 	@Override
+	@DELETE
 	@Path("{categoryId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -151,10 +153,10 @@ public class TaskCategoryWS implements WebServices {
 	 */
 	@Override
 	@GET
-	@Path("{user_id}")
+	@Path("{categoryId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(Integer categoryId) {
+	public Response getById(@PathParam("categoryId") Integer categoryId) {
 
 		TaskCategory category = new TaskCategory();
 		category = dao.getById(categoryId);

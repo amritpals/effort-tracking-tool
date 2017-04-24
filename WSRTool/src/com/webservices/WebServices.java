@@ -13,5 +13,5 @@ public interface WebServices {
 
 	public Response delete(Integer obj_id);
 
-	public Object getById(Integer obj_id);
+	public Response getById(Integer obj_id);
 }

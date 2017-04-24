@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -28,6 +29,7 @@ import com.application.GenericDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.model.Project;
+import com.model.TaskCategory;
 
 /**
  * @author Amrit
@@ -132,13 +134,58 @@ public class ProjectWS implements WebServices {
 	@Path("{project_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(@PathParam("project_id") Integer project_id) {
+	public Response getById(@PathParam("project_id") Integer project_id) {
 		Project project = new Project();
 		project = dao.getById(project_id);
 		if (project == null) {
 			return Response.status(404).entity("No Records found!").build();
 		} else {
 			return Response.status(200).entity(project.toString()).build();
+		}
+	}
+	
+	@PUT
+	@Path("{project_id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateById(@PathParam("project_id") Integer project_id,
+			@Context HttpServletRequest request){
+		
+		Project project = (Project) findProject(project_id);
+		Project projectTmp = null;
+		Set<TaskCategory> categorySet = new HashSet<>(0);
+		if(project!=null){
+			try {
+				String content = readPostBody(request);
+				TaskCategory category = (TaskCategory) mapper.readValue(content, TaskCategory.class);
+				categorySet = project.getCategory();
+				categorySet.add(category);
+				project.setCategory(categorySet);
+				projectTmp = dao.update(project, project_id);
+			} catch (ServletException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (projectTmp == null) {
+				return Response.status(500).entity("User could not be updated!!").build();
+			} else {
+				return Response.status(200).entity(project.toString()).build();
+			}
+		}
+		return Response.status(404).entity("User could not be found!!").build();
+	}
+
+	@POST
+	@Path("/search/{projectId}")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object findProject(@FormParam("projectId") Integer projectId) {
+		Project project = new Project();
+		project = dao.getById(projectId);
+		if (project == null) {
+			return null;
+		} else {
+			return project;
 		}
 	}
 	

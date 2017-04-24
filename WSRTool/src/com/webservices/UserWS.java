@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -28,6 +29,8 @@ import com.application.GenericDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.model.User;
+
+import com.model.Project;
 
 /**
  * @author Amrit
@@ -83,6 +86,7 @@ public class UserWS implements WebServices {
 		Integer userId = null;
 		try {
 			String content = readPostBody(request);
+			System.out.println("Content: " + content);
 			User user = mapper.readValue(content, User.class);
 			userId = dao.create(user);
 		} catch (ServletException | IOException e) {
@@ -137,10 +141,10 @@ public class UserWS implements WebServices {
 		Integer val;
 		String message;
 		val = dao.delete(userId);
-		
-		if(val == 200){
+
+		if (val == 200) {
 			message = "User deleted!";
-		} else if(val == 404){
+		} else if (val == 404) {
 			message = "User couldn't be found!";
 		} else {
 			message = "Unknown error!!";
@@ -158,7 +162,7 @@ public class UserWS implements WebServices {
 	@Path("{user_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Object getById(@PathParam("user_id") Integer user_id) {
+	public Response getById(@PathParam("user_id") Integer user_id) {
 
 		User user = new User();
 		user = dao.getById(user_id);
@@ -166,6 +170,48 @@ public class UserWS implements WebServices {
 			return Response.status(404).entity("No Records found!").build();
 		} else {
 			return Response.status(200).entity(user.toString()).build();
+		}
+	}
+	
+	@PUT
+	@Path("{user_id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateById(@PathParam("user_id") Integer user_id,
+			@Context HttpServletRequest request){
+		
+		User user = (User) findUser(user_id);
+		User userTmp = null;
+		if(user!=null){
+			try {
+				String content = readPostBody(request);
+				Project project = (Project) mapper.readValue(content, Project.class);
+				user.setProjectId(project);
+				userTmp = dao.update(user, user_id);
+			} catch (ServletException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (userTmp == null) {
+				return Response.status(500).entity("User could not be updated!!").build();
+			} else {
+				return Response.status(200).entity(user.toString()).build();
+			}
+		}
+		return Response.status(404).entity("User could not be found!!").build();
+	}
+
+	@POST
+	@Path("/search/{userId}")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Object findUser(@FormParam("userId") Integer userId) {
+		User user = new User();
+		user = dao.getById(userId);
+		if (user == null) {
+			return null;
+		} else {
+			return user;
 		}
 	}
 

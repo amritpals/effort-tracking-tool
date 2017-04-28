@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.google.gson.Gson;
+
 /**
  * @author Amrit
  *
@@ -101,8 +103,7 @@ public class TaskCategory {
 	 */
 	@Override
 	public String toString() {
-		return "TaskCategory [categoryId=" + id + ", name=" + name + ", isEnabled=" + isEnabled + ", cost="
-				+ cost + "]";
+		return new Gson().toJson(this);
 	}
 
 }

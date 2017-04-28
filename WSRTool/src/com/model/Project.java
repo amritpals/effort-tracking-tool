@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.google.gson.Gson;
+
 /**
  * @author Amrit
  *
@@ -39,7 +41,7 @@ public class Project {
 
 	private String intelManagerName;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private Set<TaskCategory> category = new HashSet<>(0);
 	
 	public Project() {
@@ -166,8 +168,7 @@ public class Project {
 	 */
 	@Override
 	public String toString() {
-		return "Project [projectId=" + id + ", projectName=" + projectName + ", billingModel=" + billingModel
-				+ ", budget=" + budget + ", isEnabled=" + isEnabled + ", intelManagerName=" + intelManagerName + "]";
+		return new Gson().toJson(this);
 	}
 
 }

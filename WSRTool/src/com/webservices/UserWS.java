@@ -186,7 +186,7 @@ public class UserWS implements WebServices {
 			try {
 				String content = readPostBody(request);
 				Project project = (Project) mapper.readValue(content, Project.class);
-				user.setProjectId(project);
+				user.setProject(project);
 				userTmp = dao.update(user, user_id);
 			} catch (ServletException | IOException e) {
 				// TODO Auto-generated catch block

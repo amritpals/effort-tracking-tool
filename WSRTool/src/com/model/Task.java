@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.google.gson.Gson;
+
 /**
  * @author Amrit
  *
@@ -31,10 +33,10 @@ public class Task {
 	private Date dateAssigned;
 	private String assignedBy;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private User userId;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	private TaskCategory categoryId;
 	
 	public Task(){
@@ -156,9 +158,7 @@ public class Task {
 	 */
 	@Override
 	public String toString() {
-		return "Task [taskId=" + id + ", description=" + description + ", duration=" + duration + ", dateAssigned="
-				+ dateAssigned + ", assignedBy=" + assignedBy + ", userId=" + userId + ", categoryId=" + categoryId
-				+ "]";
+		return new Gson().toJson(this);
 	}
 
 }

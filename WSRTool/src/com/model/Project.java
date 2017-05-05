@@ -41,7 +41,7 @@ public class Project {
 
 	private String intelManagerName;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	private Set<TaskCategory> category = new HashSet<>(0);
 	
 	public Project() {

@@ -97,6 +97,9 @@ public class ProjectWS implements WebServices {
 		try {
 			String content = readPostBody(request);
 			Project project = mapper.readValue(content, Project.class);
+			projectTmp = dao.getById(project.getId());
+			Set<TaskCategory> categorySet = projectTmp.getCategory();
+			project.setCategory(categorySet);
 			projectTmp = dao.update(project, project.getId());
 		} catch (ServletException | IOException e) {
 			// TODO Auto-generated catch block
@@ -144,6 +147,35 @@ public class ProjectWS implements WebServices {
 		}
 	}
 	
+	@PUT
+	@Path("{projectId}/Category/{categoryId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateCategory(@PathParam("projectId") Integer projectId, 
+			@PathParam("categoryId") Integer categoryId) {
+
+		Project project = (Project) findProject(projectId);
+		Project projectTmp = null;
+		Set<TaskCategory> categorySet = new HashSet<>(0);
+		if(categorySet != null){
+			GenericDAO<TaskCategory> categoryDAO = new GenericDAO<>(TaskCategory.class);
+			TaskCategory category = categoryDAO.getById(categoryId);
+			if(category != null){
+				categorySet.add(category);
+				project.setCategory(categorySet);
+				projectTmp = dao.update(project, projectId);
+			} else {
+				return Response.status(404).entity("Project could not be found!!").build();
+			}
+		}
+		
+		if (projectTmp == null) {
+			return Response.status(500).entity("Project could not be updated!!").build();
+		} else {
+			return Response.status(200).entity(projectTmp.toString()).build();
+		}
+	}
+
 	@PUT
 	@Path("{project_id}")
 	@Consumes(MediaType.APPLICATION_JSON)

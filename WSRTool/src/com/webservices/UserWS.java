@@ -28,9 +28,8 @@ import javax.ws.rs.core.Response;
 import com.application.GenericDAO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.model.User;
-
 import com.model.Project;
+import com.model.User;
 
 /**
  * @author Amrit
@@ -115,6 +114,8 @@ public class UserWS implements WebServices {
 		try {
 			String content = readPostBody(request);
 			User user = mapper.readValue(content, User.class);
+			userTmp = dao.getById(user.getId());
+			user.setProject(userTmp.getProject());
 			userTmp = dao.update(user, user.getId());
 		} catch (ServletException | IOException e) {
 			// TODO Auto-generated catch block
@@ -172,21 +173,84 @@ public class UserWS implements WebServices {
 			return Response.status(200).entity(user.toString()).build();
 		}
 	}
-	
+
+	@PUT
+	@Path("{userId}/Project/{projectId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateProject(@PathParam("userId") Integer userId, @PathParam("projectId") Integer projectId) {
+
+		User user = (User) findUser(userId);
+		User userTmp = null;
+		Set<Project> projectSet = new HashSet<>(0);
+		if (user != null) {
+			GenericDAO<Project> projectDAO = new GenericDAO<>(Project.class);
+			Project project = projectDAO.getById(projectId);
+			if (project != null) {
+				projectSet.add(project);
+				user.setProject(projectSet);
+				userTmp = dao.update(user, userId);
+			} else {
+				return Response.status(404).entity("Project could not be found!!").build();
+			}
+		} else {
+			return Response.status(404).entity("User could not be found!!").build();
+		}
+		if (userTmp == null) {
+			return Response.status(500).entity("User could not be updated!!").build();
+		} else {
+			return Response.status(200).entity(userTmp.toString()).build();
+		}
+	}
+
+	/*
+	 * @PUT
+	 * 
+	 * @Path("{userId}")
+	 * 
+	 * @Consumes(MediaType.APPLICATION_JSON)
+	 * 
+	 * @Produces(MediaType.APPLICATION_JSON) public Response
+	 * updateById(@PathParam("userId") Integer userId, @Context UriInfo ui) {
+	 * 
+	 * MultivaluedMap<String, String> payload = ui.getQueryParameters(); String
+	 * st = ui.getQueryParameters().toString(); //String st =
+	 * prepareParameters(payload); final ObjectMapper mapper = new
+	 * ObjectMapper(); try { User user = mapper.readValue(st, User.class); }
+	 * catch (JsonParseException e) { // TODO Auto-generated catch block
+	 * e.printStackTrace(); } catch (JsonMappingException e) { // TODO
+	 * Auto-generated catch block e.printStackTrace(); } catch (IOException e) {
+	 * // TODO Auto-generated catch block e.printStackTrace(); }
+	 * 
+	 * return null; }
+	 * 
+	 * private Map<String, String> prepareParameters(MultivaluedMap<String,
+	 * String> queryParameters) { Map<String, String> parameters = new
+	 * HashMap<String, String>(); Iterator<String> it =
+	 * queryParameters.keySet().iterator(); while (it.hasNext()) { String theKey
+	 * = (String) it.next(); parameters.put(theKey,
+	 * queryParameters.getFirst(theKey)); } return parameters; }
+	 * 
+	 * public static String paramJson(String paramIn) { paramIn =
+	 * paramIn.replaceAll("=", "\":\""); paramIn = paramIn.replaceAll("&",
+	 * "\",\""); return "{\"" + paramIn + "\"}"; }
+	 */
+
 	@PUT
 	@Path("{user_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateById(@PathParam("user_id") Integer user_id,
-			@Context HttpServletRequest request){
-		
+	public Response updateById(@PathParam("user_id") Integer user_id, @Context HttpServletRequest request) {
 		User user = (User) findUser(user_id);
 		User userTmp = null;
-		if(user!=null){
+		Set<Project> projectSet = new HashSet<>(0);
+		if (user != null) {
 			try {
 				String content = readPostBody(request);
 				Project project = (Project) mapper.readValue(content, Project.class);
-				user.setProject(project);
+				projectSet = user.getProject();
+				projectSet.add(project);
+				user.setProject(projectSet);
 				userTmp = dao.update(user, user_id);
 			} catch (ServletException | IOException e) {
 				// TODO Auto-generated catch block

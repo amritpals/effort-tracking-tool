@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -187,12 +188,44 @@ public class UserWS implements WebServices {
 			GenericDAO<Project> projectDAO = new GenericDAO<>(Project.class);
 			Project project = projectDAO.getById(projectId);
 			if (project != null) {
+				projectSet = user.getProject();
 				projectSet.add(project);
 				user.setProject(projectSet);
 				userTmp = dao.update(user, userId);
 			} else {
 				return Response.status(404).entity("Project could not be found!!").build();
 			}
+		} else {
+			return Response.status(404).entity("User could not be found!!").build();
+		}
+		if (userTmp == null) {
+			return Response.status(500).entity("User could not be updated!!").build();
+		} else {
+			return Response.status(200).entity(userTmp.toString()).build();
+		}
+	}
+	
+	@DELETE
+	@Path("{userId}/Project/{projectId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deallocateProject(@PathParam("userId") Integer userId, @PathParam("projectId") Integer projectId){
+		
+		User user = (User) findUser(userId);
+		User userTmp = null;
+		Set<Project> projectSet = new HashSet<>(0);
+		if (user != null) {
+			projectSet = user.getProject();
+			Set<Project> tmpSet = projectSet;
+			Iterator<Project> iter = tmpSet.iterator();
+			for(;iter.hasNext();){
+				Project project = iter.next();
+				if(project.getId() == projectId){
+					projectSet.remove(project);
+				}
+			}
+			user.setProject(projectSet);
+			userTmp = dao.update(user, userId);
 		} else {
 			return Response.status(404).entity("User could not be found!!").build();
 		}

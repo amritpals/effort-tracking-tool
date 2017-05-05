@@ -33,10 +33,10 @@ public class Task {
 	private Date dateAssigned;
 	private String assignedBy;
 	
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	private User userId;
 	
-	@ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@ManyToOne(cascade = CascadeType.PERSIST)
 	private TaskCategory categoryId;
 	
 	public Task(){

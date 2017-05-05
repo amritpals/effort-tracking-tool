@@ -4,6 +4,8 @@
 package com.model;
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,7 +14,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import com.google.gson.Gson;
@@ -42,8 +44,8 @@ public class User {
 	private Boolean isManager;
 	private Boolean isEnabled;
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-	private Project project;
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	private Set<Project> project = new HashSet<>(0);
 	
 	public User(){
 		// ToDo
@@ -64,7 +66,7 @@ public class User {
 	 * @param project
 	 */
 	public User(String firstName, String lastName, String emailId, String password, String role, Date dob, int wwid,
-			int wiproEmpId, Boolean isAdmin, Boolean isManager, Boolean isEnabled, Project project) {
+			int wiproEmpId, Boolean isAdmin, Boolean isManager, Boolean isEnabled, Set<Project> project) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.emailId = emailId;
@@ -238,14 +240,14 @@ public class User {
 	/**
 	 * @return the projectId
 	 */
-	public Project getProject() {
+	public Set<Project> getProject() {
 		return project;
 	}
 
 	/**
 	 * @param projectId the projectId to set
 	 */
-	public void setProject(Project project) {
+	public void setProject(Set<Project> project) {
 		this.project = project;
 	}
 

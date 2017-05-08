@@ -179,7 +179,7 @@ public class UserWS implements WebServices {
 	@Path("{userId}/Project/{projectId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateProject(@PathParam("userId") Integer userId, @PathParam("projectId") Integer projectId) {
+	public Response allocateProject(@PathParam("userId") Integer userId, @PathParam("projectId") Integer projectId) {
 
 		User user = (User) findUser(userId);
 		User userTmp = null;
@@ -216,12 +216,11 @@ public class UserWS implements WebServices {
 		Set<Project> projectSet = new HashSet<>(0);
 		if (user != null) {
 			projectSet = user.getProject();
-			Set<Project> tmpSet = projectSet;
-			Iterator<Project> iter = tmpSet.iterator();
+			Iterator<Project> iter = projectSet.iterator();
 			for(;iter.hasNext();){
 				Project project = iter.next();
 				if(project.getId() == projectId){
-					projectSet.remove(project);
+					iter.remove();
 				}
 			}
 			user.setProject(projectSet);

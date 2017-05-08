@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -151,7 +152,7 @@ public class ProjectWS implements WebServices {
 	@Path("{projectId}/Category/{categoryId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateCategory(@PathParam("projectId") Integer projectId, 
+	public Response allocatedCategory(@PathParam("projectId") Integer projectId, 
 			@PathParam("categoryId") Integer categoryId) {
 
 		Project project = (Project) findProject(projectId);
@@ -161,6 +162,7 @@ public class ProjectWS implements WebServices {
 			GenericDAO<TaskCategory> categoryDAO = new GenericDAO<>(TaskCategory.class);
 			TaskCategory category = categoryDAO.getById(categoryId);
 			if(category != null){
+				categorySet = project.getCategory();
 				categorySet.add(category);
 				project.setCategory(categorySet);
 				projectTmp = dao.update(project, projectId);
@@ -169,6 +171,37 @@ public class ProjectWS implements WebServices {
 			}
 		}
 		
+		if (projectTmp == null) {
+			return Response.status(500).entity("Project could not be updated!!").build();
+		} else {
+			return Response.status(200).entity(projectTmp.toString()).build();
+		}
+	}
+	
+	@DELETE
+	@Path("{projectId}/Category/{categoryId}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deallocateCategory(@PathParam("projectId") Integer projectId, 
+			@PathParam("categoryId") Integer categoryId){
+		
+		Project project = (Project) findProject(projectId);
+		Project projectTmp = null;
+		Set<TaskCategory> categorySet = new HashSet<>(0);
+		if (project != null) {
+			categorySet = project.getCategory();
+			Iterator<TaskCategory> iter = categorySet.iterator();
+			for(;iter.hasNext();){
+				TaskCategory category = iter.next();
+				if(category.getId() == categoryId){
+					iter.remove();
+				}
+			}
+			project.setCategory(categorySet);
+			projectTmp = dao.update(project, projectId);
+		} else {
+			return Response.status(404).entity("Project could not be found!!").build();
+		}
 		if (projectTmp == null) {
 			return Response.status(500).entity("Project could not be updated!!").build();
 		} else {
